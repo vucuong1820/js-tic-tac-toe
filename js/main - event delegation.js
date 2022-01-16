@@ -1,5 +1,5 @@
 import { CELL_VALUE, GAME_STATUS, TURN } from "./constants.js";
-import { getCellElementList, getCurrentTurnElement, getCellElementAtIdx, getGameStatusElement, getReplayBtnElement} from "./selectors.js"
+import { getCellElementList, getCurrentTurnElement, getCellElementAtIdx, getGameStatusElement, getReplayBtnElement, getUlElement} from "./selectors.js"
 import { checkGameStatus } from "./utils.js"
 /**
  * Global variables
@@ -53,7 +53,6 @@ function highlightWinCells(winPositions){
 function toggleTurn(){
     //toggle current turn
     currentTurn = currentTurn === TURN.CROSS ? TURN.CIRCLE : TURN.CROSS;
-    
     //update to current turn status on DOM
     const currentTurnElement = getCurrentTurnElement();
     if(currentTurnElement){
@@ -112,14 +111,23 @@ function handleCellClick(cellElement,index) {
 }
 
 function initCellElementList(){
-    //get from DOM
+    //bind index for data-idx attribute for li
     const cellElementList = getCellElementList()
     if(!cellElementList) return;
-    //loop and call handle func
     cellElementList.forEach((cellElement,index) => {
-        cellElement.addEventListener('click',() => {
-            handleCellClick(cellElement,index)
-        })
+        cellElement.dataset.idx = index;
+    })
+
+    //bind events for ul
+    const ulElement = getUlElement();
+    console.log(ulElement)
+    ulElement.addEventListener('click', (e) => {
+        //get li element by e.target
+        const liElement = e.target;
+        if(liElement.tagName !== "LI") return;
+        //get index by attribute data-idx
+        const index = liElement.dataset.idx;
+        handleCellClick(liElement,index)
     })
 }
 function resetGame(){

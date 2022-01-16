@@ -1,3 +1,5 @@
+import { CELL_VALUE } from "./constants.js";
+import { GAME_STATUS } from "./constants.js";
 // Write a function to check status of tic-tac-toe game
 // Ref: what is tic-tac-toe game: https://en.wikipedia.org/wiki/Tic-tac-toe
 // In summary, tic-tac-toe game has 9 cells divided into 3 rows of 3 cells.
@@ -23,10 +25,14 @@
 //    - Return empty array.
 //
 // Example:
-// Input array: cellValues = ['X', 'O', 'O', '', 'X', '', '', 'O', 'X']; represent for
+// Input array: cellValues = ['X', 'O', 'O', 'O', 'X', 'X', 'X', 'O', 'O']; represent for
 // |  X  | O  | O  |
 // |     | X  |    |
 // |     | O  | X  |
+
+// |  X  | O  | O  |
+// |   o | X  |  x  |
+// |    x | O  | o  |
 // -----
 // ANSWER:
 // {
@@ -41,9 +47,46 @@ export function checkGameStatus(cellValues) {
   // Write your code here ...
   // Please feel free to add more helper function if you want.
   // It's not required to write everything just in this function.
+  const winIndexSetList = [
+    //horizontal
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+
+    //vertical
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+
+    //diagonal
+    [0, 4, 8],
+    [2, 4, 6]
+
+  ]
+  
+  //win
+  const winIndexSet = winIndexSetList.findIndex(set => {
+    const first = cellValues[set[0]]
+    const second = cellValues[set[1]]
+    const third = cellValues[set[2]]
+    
+    return first !== '' && first === second && second === third;
+  })
+  if(winIndexSet >= 0 ){
+    const winValueIndex = winIndexSetList[winIndexSet][0]
+    const winValue = cellValues[winValueIndex]
+
+    return {
+      status: winValue === CELL_VALUE.CIRCLE ? GAME_STATUS.O_WIN : GAME_STATUS.X_WIN,
+      winPositions: winIndexSetList[winIndexSet],
+    }
+  }
+  
+  //keep playing or end
+  const isPlaying = cellValues.filter(x => x === '').length > 0 
 
   return {
-    status: GAME_STATUS.PLAYING,
+    status: isPlaying ? GAME_STATUS.PLAYING : GAME_STATUS.ENDED,
     winPositions: [],
-  };
+    };
 }
